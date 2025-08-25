@@ -9,8 +9,16 @@ import useColorScheme from '@/hooks/useColorScheme';
 import Stopwatch from '@/components/stopWatch';
 
 export default function JuegoScreen() {
-  const router = useRouter();
+  // Log player names for debugging
   const { cedulaData } = useCedula();
+  const playerNames = cedulaData.marcador.map(p => p.jugador);
+  console.log('Jugadores en marcador:', playerNames);
+  const router = useRouter();
+  // Log player names for debugging
+  if (cedulaData && cedulaData.marcador) {
+    const playerNames = cedulaData.marcador.map(p => p.jugador);
+    console.log('Jugadores en marcador:', playerNames);
+  }
   const colorScheme = useColorScheme();
   
   const calcularPuntos = (equipo: 'A' | 'B') => {
