@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Platfo
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useCedula } from '@/context/CedulaContext';
+
 import Colors from '@/constants/Colors';
 import useColorScheme from '@/hooks/useColorScheme';
 import Toast from 'react-native-toast-message';
@@ -88,35 +89,41 @@ const Input = memo(({
   keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
 }) => {
   const colorScheme = useColorScheme();
-  return (
-    <View style={styles.section}>
-      <Text style={[styles.label, { color: Colors[colorScheme].text }]}>{label}</Text>
-      <TextInput
-        style={[
-          styles.input,
-          multiline && styles.multilineInput,
-          { backgroundColor: Colors[colorScheme].inputBackground, color: Colors[colorScheme].text }
-        ]}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={Colors[colorScheme].textSecondary}
-        multiline={multiline}
-        autoCorrect={false}
-        autoCapitalize="none"
-        textAlignVertical={multiline ? 'top' : 'center'}
-        keyboardType={keyboardType}
-        returnKeyType="done"
-        blurOnSubmit
-      />
-    </View>
-  );
+    return (
+      <View style={styles.section}>
+        <Text style={[styles.label, { color: Colors[colorScheme].text }]}>{label}</Text>
+        <TextInput
+          style={[
+            styles.input,
+            multiline && styles.multilineInput,
+            { backgroundColor: Colors[colorScheme].inputBackground, color: Colors[colorScheme].text }
+          ]}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={Colors[colorScheme].textSecondary}
+          multiline={multiline}
+          autoCorrect={false}
+          autoCapitalize="none"
+          textAlignVertical={multiline ? 'top' : 'center'}
+          keyboardType={keyboardType}
+          returnKeyType="done"
+          blurOnSubmit
+        />
+      </View>
+    );
 });
 
 export default function RecoleccionFirmas() {
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const { cedulaData } = useCedula();
+  const { cedulaData, jugadoresLocal, jugadoresVisitante } = useCedula();
+
+  // Imprimir jugadores al montar el componente
+  React.useEffect(() => {
+    console.log('👥 jugadoresLocal (on mount):', jugadoresLocal);
+    console.log('👥 jugadoresVisitante (on mount):', jugadoresVisitante);
+  }, [jugadoresLocal, jugadoresVisitante]);
 
   const [form, setForm] = useState({
     capitanLocalNombre: '',
@@ -287,12 +294,26 @@ export default function RecoleccionFirmas() {
       }
 
       if (!Number.isFinite(partidoIdFinal) || partidoIdFinal <= 0) {
-        Toast.show({ type: 'error', text1: 'Correo', text2: 'partidoId inválido para enviar correo' });
-        setIsSubmitting(false);
+      // Define CedulaDataWithJugadores type inline to avoid type errors
+      type CedulaDataWithJugadores = typeof cedulaData & {
+        jugadoresLocal?: any[];
+        jugadoresVisitante?: any[];
+      };
+      const { jugadoresLocal = [], jugadoresVisitante = [] } = cedulaData as CedulaDataWithJugadores;
         return;
       }
 
-      const mail = await postJson(EMAIL_URL, { partidoId: partidoIdFinal }, { timeoutMs: 35000, retries: 2, backoffMs: 1800 });
+
+      // Tomar los jugadores igual que en puntos.tsx (del contexto)
+      console.log('👥 jugadoresLocal (from context):', jugadoresLocal);
+      console.log('👥 jugadoresVisitante (from context):', jugadoresVisitante);
+      // Enviar también los jugadores al endpoint de correos
+      const mailPayload = {
+        partidoId: partidoIdFinal,
+        jugadoresLocal,
+        jugadoresVisitante
+      };
+      const mail = await postJson(EMAIL_URL, mailPayload, { timeoutMs: 30000, retries: 0 });
       console.log('📧 Respuesta envío correo (status):', mail.status, 'ok:', mail.ok, 'body:', mail.data ?? mail.text);
 
       if (!mail.ok) {
