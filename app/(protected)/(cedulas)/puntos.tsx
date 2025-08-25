@@ -13,8 +13,10 @@ import { VolverButton } from '@/components/ui/BackButton';
 
 export default function RegistroPuntos() {
   const router = useRouter();
-  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante, cronometro } =
-    useCedula();
+  const { cedulaData, setCedulaData, jugadoresLocal, jugadoresVisitante, cronometro } = useCedula();
+  // Debug: print jugadoresLocal and jugadoresVisitante
+  console.log('jugadoresLocal:', jugadoresLocal);
+  console.log('jugadoresVisitante:', jugadoresVisitante);
 
   const [equipo, setEquipo] = useState<'A' | 'B'>('A');
   const [jugador, setJugador] = useState<number | 'no_registrado' | null>(null);
