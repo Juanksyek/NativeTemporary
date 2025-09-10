@@ -13,7 +13,7 @@ import { User } from '@/types/user';
 import { AuthContext } from '@/context/AuthContext';
 import Toast from 'react-native-toast-message';
 import { updateUserProfile } from '@/api/user/update';
-import { estados, parentescoOptions } from '@/utils/register';
+import { estados, parentescoOptions, TIPO_SANGRE_OPTIONS } from '@/utils/register';
 
 
 type UserField = keyof User;
@@ -147,6 +147,30 @@ export default function EditProfileScreen() {
               placeholder="correo@ejemplo.com"
               keyboardType="email-address"
               autoCapitalize="none"
+              isRequired
+            />
+
+            <FormInput
+              label="CURP"
+              value={userData.curp}
+              onChangeText={(text) => handleChange('curp', text)}
+              placeholder="CURP"
+              isRequired
+            />
+
+            <FormInput
+              label="RFC"
+              value={userData.rfc}
+              onChangeText={(text) => handleChange('rfc', text)}
+              placeholder="RFC"
+            />
+
+
+            <SelectInput
+              label="Tipo de sangre"
+              value={userData.tipoSangre}
+              onSelect={(value) => handleChange('tipoSangre', value)}
+              options={TIPO_SANGRE_OPTIONS}
               isRequired
             />
           </View>

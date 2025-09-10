@@ -11,7 +11,7 @@ type SuspensionInfo = {
 };
 
 interface Player {
-  id: string;            // viene como string en tu lista actual
+  id: string; 
   nombre: string;
   apellido1: string;
   foto?: string;
