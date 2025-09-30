@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Text, TextInput, TouchableOpacity, StyleSheet, useColorScheme, ScrollView } from 'react-native';
+import { Text, TextInput, TouchableOpacity, StyleSheet, useColorScheme, ScrollView, View } from 'react-native';
 import { AuthContext } from '@/context/AuthContext';
 import { router } from 'expo-router';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
@@ -7,6 +7,7 @@ import { usePushNotifications } from '@/hooks/usePushNotifications';
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const { expoPushToken } = usePushNotifications();
   const expoPushTokenString = expoPushToken?.data
 
@@ -19,6 +20,10 @@ const LoginScreen = () => {
   const handleLogin = () => {
     const lowercaseUsername = username.toLowerCase();
     authContext.logIn({ username: lowercaseUsername, password, expoPushTokenString });
+  };
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -34,14 +39,25 @@ const LoginScreen = () => {
         autoCapitalize="none" 
         keyboardType="email-address" 
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholderTextColor="#555"
-      />
+      
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Contraseña"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+          placeholderTextColor="#555"
+        />
+        <TouchableOpacity 
+          style={styles.showPasswordButton}
+          onPress={toggleShowPassword}
+        >
+          <Text style={styles.showPasswordText}>
+            {showPassword ? 'Ocultar' : 'Mostrar'}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity 
         style={styles.loginButton} 
@@ -97,6 +113,28 @@ const getStyles = (dark: boolean) =>
       fontSize: 16,
       marginBottom: 16,
       color: dark ? '#fff' : '#000',
+    },
+    passwordContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: dark ? '#B8E0C51F' : '#EFF3F0',
+      borderRadius: 12,
+      marginBottom: 16,
+    },
+    passwordInput: {
+      flex: 1,
+      padding: 14,
+      fontSize: 16,
+      color: dark ? '#fff' : '#000',
+    },
+    showPasswordButton: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+    },
+    showPasswordText: {
+      color: '#1B9142',
+      fontWeight: '500',
+      fontSize: 14,
     },
     loginButton: {
       backgroundColor: '#1B9142',

@@ -33,6 +33,7 @@ export const useConvocatorias = (clubId?: number) => {
     const [isOffline, setIsOffline] = useState<boolean>(false);
     const { user } = useContext(AuthContext);
 
+    
     const getNearestMatch = (matches: TournamentMatch[]): TournamentMatch | null => {
         if (!matches.length) return null;
     

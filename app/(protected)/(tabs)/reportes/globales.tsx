@@ -48,7 +48,7 @@ export default function GlobalesScreen() {
     const [showTeamStats, setShowTeamStats] = useState(false);
 
     useEffect(() => {
-        if (user?.tipoRegistro_2 === 1) {
+        if (user?.rol === "capitan") {
             setShowTeamStats(true);
         } else {
             setShowTeamStats(false);

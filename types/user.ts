@@ -79,9 +79,10 @@ export interface User {
   club?: string;
   equipoUniversitario?: string;
   equipoEstatal?: string;
-  rol?: 'usuario' | 'Capitán' | 'representante';
+  rol?: 'usuario' | 'capitan' | 'admin' | 'arbitro';
   createdAt?: Date;
   updatedAt?: Date;
+  rfc?: string;
 }
 
 export interface Player {
@@ -91,3 +92,14 @@ export interface Player {
   club: string;
   foto?: string;
 }
+
+export interface ClubMemberFormatted {
+  _id: string;
+  apellido1: string;
+  apellido2: string;
+  club: string;
+  clubId: number;
+  foto: string;
+  id: number;
+  nombre: string;
+};

@@ -1,9 +1,10 @@
 import { AuthService } from "@/services/auth";
-import { User } from "@/types/user";
+import { Player, User } from "@/types/user";
 import { SplashScreen, useRouter } from "expo-router";
 import { createContext, PropsWithChildren, useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchClubPlayers } from "@/api/user/clubPlayers";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -14,6 +15,7 @@ type AuthState = {
   isLoading: boolean;
   token: string | null,
   refreshUser: () => Promise<void>;
+  players: Player[] | null
 };
 
 type LoginProps = {
@@ -28,7 +30,8 @@ export const AuthContext = createContext<AuthState>({
   user: null,
   isLoading: true,
   token: null, 
-  refreshUser: async () => {}
+  refreshUser: async () => {},
+  players: null
 });
 
 export function AuthProvider({ children }: PropsWithChildren) {
@@ -37,6 +40,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -104,7 +108,12 @@ export function AuthProvider({ children }: PropsWithChildren) {
         if (userData?.clubId) {
           await AsyncStorage.setItem("clubId", String(userData.clubId));
           console.log("✔️ Club ID guardado:", userData.clubId);
+          const clubPlayers = await fetchClubPlayers(userData.clubId, response.token);
+          setPlayers(clubPlayers)
+          console.log(clubPlayers)
+
         } else {
+          setPlayers([])
           console.warn("⚠️ No se encontró clubId en los datos del usuario");
           await AsyncStorage.removeItem("clubId");
         }
@@ -153,7 +162,8 @@ export function AuthProvider({ children }: PropsWithChildren) {
         user,
         isLoading,
         token,
-        refreshUser
+        refreshUser, 
+        players
       }}
     >
       {children}

@@ -42,7 +42,7 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
   const getScores = () => {
     if (!match.resultadoResumen) return { localScore: '0', awayScore: '0' };
     
-    const matchResult = match.resultadoResumen.match(/(\d+).*vs.*(\d+)/);
+    const matchResult = match.resultadoResumen.match(/(\d+)\s*(?:vs|[-:]|to)\s*(\d+)/i);
     if (matchResult && matchResult.length >= 3) {
       return { localScore: matchResult[1], awayScore: matchResult[2] };
     }
@@ -251,7 +251,7 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
 
       {isLarge && !isFinished && (
         <>
-          {user?.rol === "Capitán" && (
+          {user?.rol === "capitan" && (
             <TouchableOpacity 
               style={[styles.actionButton, { backgroundColor: "#000000" }]}
               onPress={handleCapitanPress}
@@ -260,7 +260,7 @@ export default function MatchCard({ match, variant = 'small' }: MatchCardProps) 
             </TouchableOpacity>
           )}
           
-          {user?.tipoRegistro_3 === 1 && (
+          {user?.rol === "arbitro" && (
             <TouchableOpacity 
               style={[styles.actionButton, { backgroundColor: "#000000" }]}
               onPress={handleArbitroPress}

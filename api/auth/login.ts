@@ -41,7 +41,6 @@ export const fetchUserData = async (id: string) => {
   try {
     if (!id) return;
 
-    const API_BASE_URL = "https://fmru-next-js.vercel.app";
     const url = `${API_BASE_URL}/api/app-native-api/usuario/me?id=${id}`;
 
     const response = await fetch(url, {

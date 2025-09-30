@@ -27,6 +27,7 @@ export default function HomeScreen() {
   const { data, refetch, loading, error, isOffline, pastMatches } = useConvocatorias(user?.clubId ?? undefined);
   const nextMatch = data.nextMatch;
 
+  console.log(pastMatches)
   useEffect(() => {
     if (!loading) {
       setInitialLoad(false);

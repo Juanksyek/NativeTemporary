@@ -17,6 +17,7 @@ export default function MatchReportScreen() {
   const [matchData, setMatchData] = useState<CedulaResponse>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
 
   useEffect(() => {
     const loadData = async () => {
@@ -25,6 +26,7 @@ export default function MatchReportScreen() {
         const result = await fetchMatchReports(matchId);
         setMatchData(result);
         
+        console.log(result.resultados[0])
       } catch (err) {
         console.error('Error:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
