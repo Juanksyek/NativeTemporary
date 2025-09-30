@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, KeyboardAvoidingView, Platform, Alert, Linking } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, KeyboardAvoidingView, Platform, Alert, Linking, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
@@ -14,7 +14,7 @@ import { AuthContext } from '@/context/AuthContext';
 import Toast from 'react-native-toast-message';
 import { updateUserProfile } from '@/api/user/update';
 import { estados, parentescoOptions, TIPO_SANGRE_OPTIONS } from '@/utils/register';
-
+import * as ImagePicker from 'expo-image-picker';
 
 type UserField = keyof User;
 
@@ -22,12 +22,15 @@ export default function EditProfileScreen() {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const { user, token, refreshUser } = useContext(AuthContext);
+  console.log(user)
   const [userData, setUserData] = useState<User | null>(user); 
+  const [imageUri, setImageUri] = useState<string | null>(user?.foto || null);
 
   if (!user) return null;
 
   if (user && userData === null) {
     setUserData(user);
+    setImageUri(user.foto || null);
   }
 
   if (userData === null) return null;
@@ -40,6 +43,108 @@ export default function EditProfileScreen() {
         [field]: value,
       };
     });
+  };
+
+  const pickImage = async () => {
+    try {
+      // Request permissions
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert('Permisos necesarios', 'Se necesitan permisos de galería para cambiar la foto de perfil.');
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const selectedImage = result.assets[0];
+        setImageUri(selectedImage.uri);
+        
+        // Update userData with the new image URI
+        setUserData(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            foto: selectedImage.uri,
+          };
+        });
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'No se pudo seleccionar la imagen',
+      });
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      // Request camera permissions
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert('Permisos necesarios', 'Se necesitan permisos de cámara para tomar una foto.');
+        return;
+      }
+
+      // Launch camera
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const takenPhoto = result.assets[0];
+        setImageUri(takenPhoto.uri);
+        
+        // Update userData with the new image URI
+        setUserData(prev => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            foto: takenPhoto.uri,
+          };
+        });
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'No se pudo tomar la foto',
+      });
+    }
+  };
+
+  const showImagePickerOptions = () => {
+    Alert.alert(
+      'Cambiar foto de perfil',
+      '¿Cómo quieres cambiar tu foto?',
+      [
+        {
+          text: 'Tomar foto',
+          onPress: takePhoto,
+        },
+        {
+          text: 'Elegir de galería',
+          onPress: pickImage,
+        },
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+      ]
+    );
   };
   
   const handleCancel = () => {
@@ -110,12 +215,23 @@ export default function EditProfileScreen() {
           contentContainerStyle={styles.contentContainer}
           showsVerticalScrollIndicator={false}
         >
-          <ProfileHeader
-            name={userData.nombre}
-            email={userData.email}
-            imageUrl={userData.foto || ''}
-            showCheckmark
-          />
+          <View style={styles.profileHeaderContainer}>
+            <TouchableOpacity onPress={showImagePickerOptions} style={styles.imagePickerContainer}>
+              <Image
+                source={imageUri ? { uri: imageUri } : require('@/assets/images/FMRUU.png')}
+                style={styles.profileImage}
+              />
+            </TouchableOpacity>
+            
+            <View style={styles.profileInfo}>
+              <Text style={[styles.name, { color: Colors[colorScheme].text }]}>
+                {userData.nombre}
+              </Text>
+              <Text style={[styles.email, { color: Colors[colorScheme].textSecondary }]}>
+                {userData.email}
+              </Text>
+            </View>
+          </View>
           
           <View
             style={styles.formSection}
@@ -327,6 +443,32 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: Layout.spacing.l,
     paddingBottom: Layout.spacing.xxl,
+  },
+  profileHeaderContainer: {
+    alignItems: 'center',
+    marginBottom: Layout.spacing.l,
+  },
+  imagePickerContainer: {
+    position: 'relative',
+    marginBottom: Layout.spacing.m,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+  },
+  profileInfo: {
+    alignItems: 'center',
+  },
+  name: {
+    fontSize: 20,
+    fontFamily: 'Poppins-SemiBold',
+    marginBottom: 4,
+  },
+  email: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
   },
   formSection: {
     marginBottom: Layout.spacing.l,
