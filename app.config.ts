@@ -4,7 +4,7 @@ const config = {
   name: "Rugby México",
   slug: "Ruby-Mexico",
   owner: "lolasux",
-  version: "1.1.0",
+  version: "1.2.3",
   orientation: "portrait",
   userInterfaceStyle: "automatic",
   scheme: "rugby-mexico",
