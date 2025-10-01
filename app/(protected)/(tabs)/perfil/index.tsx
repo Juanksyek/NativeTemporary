@@ -53,7 +53,11 @@ export default function ProfileScreen() {
       
       // Crear un nombre único para el archivo
       const fileName = `credencial_${user.id}_${Date.now()}.pdf`;
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      const directory = (FileSystem as any).cacheDirectory || (FileSystem as any).documentDirectory;
+      if (!directory) {
+        throw new Error('No se encontró un directorio válido para guardar el archivo');
+      }
+      const fileUri = `${directory}${fileName}`;
       
       // Convertir blob a base64
       const reader = new FileReader();
@@ -64,7 +68,7 @@ export default function ProfileScreen() {
           
           // Escribir el archivo
           await FileSystem.writeAsStringAsync(fileUri, base64, {
-            encoding: FileSystem.EncodingType.Base64,
+            encoding: "base64",
           });
 
           // Mostrar vista previa del PDF
@@ -203,7 +207,7 @@ export default function ProfileScreen() {
         <View style={[styles.profileCard, { backgroundColor: Colors[colorScheme].cardBackground }]}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={{ uri: user?.foto || undefined }}
+              source={user?.foto ? { uri: user.foto } : require('@/assets/images/LogoSnake.png')}
               style={styles.profileImage}
             />
           </View>
