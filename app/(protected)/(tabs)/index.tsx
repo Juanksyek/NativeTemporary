@@ -111,7 +111,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.profileContainer}>
             <Image
-              source={{ uri: user?.foto || "" }}
+              source={user?.foto ? { uri: user.foto } : require('@/assets/images/LogoSnake.png')}
               style={styles.profileImage}
             />
           </View>
