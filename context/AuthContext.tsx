@@ -45,6 +45,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // Pequeña demora para asegurar que el router esté listo
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         const [storedUser, storedToken] = await Promise.all([
           authService.getUser(),
           authService.getToken()
