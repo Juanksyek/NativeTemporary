@@ -7,7 +7,7 @@ export const updateUserProfile = async (userData: Partial<User>, token: string, 
     try {
         const updateData = {
             nombre: userData.nombre,
-            apellido1: userData.apellido1,
+            apellido1: userData.apellido1, // ADD THIS
             email: userData.email,
             estadoMx: userData.estadoMx,
             delegacionMunicipio: userData.delegacionMunicipio,
@@ -16,12 +16,10 @@ export const updateUserProfile = async (userData: Partial<User>, token: string, 
             cel: userData.cel,
             cp: userData.cp,
             ceNombre: userData.ceNombre,
-            ceCel: userData.ceCel, 
+            ceCel: userData.ceCel,
             ceTel: userData.ceTel,
             ceParentesco: userData.ceParentesco,
-            rfc: userData.rfc,
-            curp: userData.curp,
-            tipoSangre: userData.tipoSangre
+            foto: userData.foto, // Include photo data (base64)
         };
   
         console.log('Update payload:', updateData);
